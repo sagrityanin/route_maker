@@ -58,7 +58,7 @@ class Ip:
             ins = self.get_arg()
         all_ip_list = []
         all_ip_list.extend(self.get_aws_ip())
-        all_ip_list.extend( self.get_azure_ip())
+        # all_ip_list.extend( self.get_azure_ip())
         self.add_route(ins, all_ip_list)
     
     
