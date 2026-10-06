@@ -3,6 +3,7 @@ import subprocess
 import re
 
 GW = "10.5.0.27"
+LOG_FILE = "route_make.log"
 
 class Ip:
     def get_aws_ip(self, file="ip-ranges.json") -> list:
@@ -30,17 +31,22 @@ class Ip:
         return False       
  
     def add_route(self, ins: str, ip_list: list) -> bool:
-        for item in ip_list:
-            if self.is_valid_ip(item):
-                if ins == "y":
-                    command = f"ip route add {item} via {GW}"
-                if ins == "n":
-                    command = f"ip route del {item} via {GW}"
-                print(command)
-                cp = subprocess.run(command, shell=True, text=True)
-                print(cp.stdout)
-            else:
-                print("Not ip v4")
+        with open(LOG_FILE, "w") as f:
+            for item in ip_list:
+                if self.is_valid_ip(item):
+                    if ins == "y":
+                        command = f"ip route add {item} via {GW}"
+                    if ins == "n":
+                        command = f"ip route del {item} via {GW}"
+                    f.write(f"{command}\n")
+                    cp = subprocess.run(command, shell=True, text=True, capture_output=True)
+                    if cp.stdout:
+                        f.write(f"{cp.stdout}")
+                    if cp.stderr:
+                        f.write(f"{cp.stderr}")
+                    f.write(f"{str(cp.returncode)}\n")
+                else:
+                    f.write("Not ip v4\n")
 
     def is_valid_ip(self, ip) -> bool:
         m = re.match(r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})", ip)
@@ -50,7 +56,6 @@ class Ip:
         ins = False
         while ins is False:
             ins = self.get_arg()
-        print(ins)
         all_ip_list = []
         all_ip_list.extend(self.get_aws_ip())
         all_ip_list.extend( self.get_azure_ip())
