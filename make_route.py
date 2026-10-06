@@ -44,7 +44,6 @@ class Ip:
 
     def is_valid_ip(self, ip) -> bool:
         m = re.match(r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})", ip)
-
         return m
 
     def handler(self):
