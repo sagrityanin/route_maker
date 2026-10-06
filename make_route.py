@@ -22,6 +22,11 @@ class Ip:
             ip_list.extend(item["properties"]["addressPrefixes"])
         return ip_list
 
+    def get_youtube_ip(self, file="youtube_ip.json") -> list:
+        with open(file, "r") as f:
+            d = json.load(f)
+            return d["ip"]
+    
     def get_arg(self) -> bool:
         print("Для добавления маршрутов введите 'y', для удаления - 'n'")
         s = input()
@@ -59,6 +64,7 @@ class Ip:
         all_ip_list = []
         all_ip_list.extend(self.get_aws_ip())
         # all_ip_list.extend( self.get_azure_ip())
+        all_ip_list.extend(self.get_youtube_ip())
         self.add_route(ins, all_ip_list)
     
     
